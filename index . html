@@ -1,0 +1,1185 @@
+
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="bg-emerald-600 text-white p-2 rounded-xl text-lg font-bold shadow-md"><i class="fa-solid fa-plus"></i></span>
+                <span class="text-xl font-bold tracking-tight text-emerald-800" data-i18n="sysName">Pharmacy Pro</span>
+            </div>
+            
+            <nav class="hidden md:flex space-x-1 lg:space-x-4">
+                <button onclick="switchTab('home')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-emerald-700 bg-emerald-50 active-tab" id="btn-home"><i class="fa-solid fa-house mr-1"></i> <span data-i18n="navHome">Home</span></button>
+                <button onclick="switchTab('inventory')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100" id="btn-inventory"><i class="fa-solid fa-boxes-stacked mr-1"></i> <span data-i18n="navInventory">Inventory</span></button>
+                <button onclick="switchTab('suppliers')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100" id="btn-suppliers"><i class="fa-solid fa-truck-field mr-1"></i> <span data-i18n="navSuppliers">Suppliers</span></button>
+                <button onclick="switchTab('sales')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100" id="btn-sales"><i class="fa-solid fa-cash-register mr-1"></i> <span data-i18n="navSales">Sales</span></button>
+                <button onclick="switchTab('debts')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100" id="btn-debts"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> <span data-i18n="navDebts">Debts</span></button>
+                <button onclick="switchTab('customers')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100" id="btn-customers"><i class="fa-solid fa-users mr-1"></i> <span data-i18n="navCustomers">Customers</span></button>
+                <button onclick="switchTab('daily')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-gray-600 hover:bg-gray-100" id="btn-daily"><i class="fa-solid fa-chart-line mr-1"></i> <span data-i18n="navDaily">Daily Report</span></button>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <!-- Language Selector -->
+                <select id="language-select" onchange="changeLanguage(this.value)" class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                </select>
+
+                <div class="text-sm font-semibold bg-gray-100 px-3 py-1.5 rounded-lg text-gray-700 hidden sm:block" id="current-date-display">
+                    20/08/2026
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- HOME TAB -->
+        <section id="tab-home" class="tab-content space-y-6">
+            <h1 class="text-2xl font-bold text-gray-900" data-i18n="dashTitle">Dashboard Overview</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500" data-i18n="statSales">Today's Sales</p>
+                        <h3 class="text-2xl font-bold text-gray-900 mt-1" id="stat-sales-today">0</h3>
+                        <span class="text-xs text-emerald-600 font-medium" data-i18n="transactions">Transactions</span>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-inner">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500" data-i18n="statLow">Low Stock Alert</p>
+                        <h3 class="text-2xl font-bold text-gray-900 mt-1" id="stat-low-stock">0</h3>
+                        <span class="text-xs text-amber-600 font-medium" data-i18n="statLowSub">Medicines &le; 10</span>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500" data-i18n="statExpiry">Near Expiry</p>
+                        <h3 class="text-2xl font-bold text-gray-900 mt-1" id="stat-near-expiry">0</h3>
+                        <span class="text-xs text-rose-600 font-medium" data-i18n="statExpirySub">Check dates</span>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-inner">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500" data-i18n="statDebts">Due Debts</p>
+                        <h3 class="text-2xl font-bold text-gray-900 mt-1" id="stat-due-debts">0</h3>
+                        <span class="text-xs text-indigo-600 font-medium" data-i18n="statDebtsSub">Customers</span>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl shadow-inner">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INVENTORY TAB -->
+        <section id="tab-inventory" class="tab-content hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h1 class="text-2xl font-bold text-gray-900" data-i18n="invTitle">Inventory Management</h1>
+                <button onclick="openModal('medicine-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> <span data-i18n="addMedicineBtn">Add Medicine</span>
+                </button>
+            </div>
+
+            <!-- Filters & Search -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                    <button onclick="filterInventory('all')" class="inv-filter px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200" id="filter-all" data-i18n="filterAll">All</button>
+                    <button onclick="filterInventory('low')" class="inv-filter px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-600 hover:bg-gray-100" id="filter-low" data-i18n="filterLow">Low Stock</button>
+                    <button onclick="filterInventory('expiry')" class="inv-filter px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-600 hover:bg-gray-100" id="filter-expiry" data-i18n="filterExpiry">Near Expiry</button>
+                </div>
+                <div class="relative w-full md:w-72">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" id="search-medicine" oninput="renderInventory()" data-i18n-placeholder="searchPlaceholder" placeholder="Search medicine name..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="inv-table-dir">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
+                                <th class="p-4" data-i18n="thName">Name</th>
+                                <th class="p-4" data-i18n="thType">Type</th>
+                                <th class="p-4" data-i18n="thQty">Quantity</th>
+                                <th class="p-4" data-i18n="thAlert">Low Alert</th>
+                                <th class="p-4" data-i18n="thBuy">Buy Price</th>
+                                <th class="p-4" data-i18n="thSell">Sell Price</th>
+                                <th class="p-4" data-i18n="thProfit">Profit</th>
+                                <th class="p-4" data-i18n="thExpiry">Expiry Date</th>
+                                <th class="p-4" data-i18n="thOrigin">Origin / Lab</th>
+                                <th class="p-4 text-center" data-i18n="thActions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body" class="divide-y divide-gray-100 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUPPLIERS TAB -->
+        <section id="tab-suppliers" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900" data-i18n="supTitle">Suppliers Management</h1>
+                <button onclick="openModal('supplier-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> <span data-i18n="addSupplierBtn">Add Supply Order</span>
+                </button>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
+                            <th class="p-4" data-i18n="thSupId">ID</th>
+                            <th class="p-4" data-i18n="thSupDate">Date / Time</th>
+                            <th class="p-4" data-i18n="thSupAmount">Amount</th>
+                            <th class="p-4" data-i18n="thSupDesc">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppliers-table-body" class="divide-y divide-gray-100 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SALES TAB -->
+        <section id="tab-sales" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="sales-search-input" oninput="renderSalesSearch()" data-i18n-placeholder="salesSearchPlaceholder" placeholder="Quick search medicine to sell..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div id="sales-search-results" class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto"></div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold mb-3" data-i18n="bestSellersTitle">Best Sellers</h3>
+                    <div id="best-sellers-list" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Invoice Panel -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-3">
+                        <h3 class="font-bold text-lg text-gray-900" data-i18n="currentInvoiceTitle">Current Invoice</h3>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg" id="invoice-number-display">PH/00001</span>
+                    </div>
+
+                    <!-- Payment Type toggle -->
+                    <div class="flex gap-2 mb-3">
+                        <button onclick="setPaymentMode('paid')" id="mode-paid-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition" data-i18n="modePaid">Paid</button>
+                        <button onclick="setPaymentMode('debt')" id="mode-debt-btn" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-600 transition" data-i18n="modeDebt">Debt</button>
+                    </div>
+
+                    <div id="customer-select-container" class="hidden mb-3">
+                        <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="selectCustomerLabel">Select Customer</label>
+                        <select id="invoice-customer-select" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none"></select>
+                    </div>
+
+                    <div id="invoice-items-list" class="space-y-2 max-h-56 overflow-y-auto mb-3 divide-y divide-gray-50"></div>
+                </div>
+
+                <div class="border-t pt-4 space-y-3">
+                    <div>
+                        <span class="text-xs font-medium text-gray-500" data-i18n="paymentMethodLabel">Payment Method</span>
+                        <div class="grid grid-cols-2 gap-2 mt-1">
+                            <button onclick="setPaymentMethod('Cash')" id="pm-cash" class="py-1.5 text-xs font-medium border rounded-lg bg-emerald-50 border-emerald-200 text-emerald-700" data-i18n="methodCash">Cash</button>
+                            <button onclick="setPaymentMethod('Bankly')" id="pm-bankly" class="py-1.5 text-xs font-medium border rounded-lg bg-gray-50 border-gray-200 text-gray-600" data-i18n="methodBank">Bank App</button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold">
+                        <span data-i18n="totalLabel">Total:</span>
+                        <span class="text-emerald-600" id="invoice-total-display">0 MRU</span>
+                    </div>
+                    <button onclick="completeSale()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-sm font-semibold shadow-sm transition" data-i18n="completeBtn">
+                        Complete Transaction
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEBTS TAB -->
+        <section id="tab-debts" class="tab-content hidden space-y-6">
+            <h1 class="text-2xl font-bold text-gray-900" data-i18n="debtsTitle">Debts Tracking</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> <span data-i18n="dueDebtsTitle">Due Debts (Time to collect)</span></h3>
+                    <div id="due-debts-list" class="space-y-2 divide-y divide-gray-50"></div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-building-columns text-emerald-600"></i> <span data-i18n="pharmacyLiabilitiesTitle">Pharmacy Liabilities (Due to suppliers)</span></h3>
+                    <div class="p-4 bg-gray-50 rounded-xl flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600" data-i18n="totalLiabilitiesLabel">Total Liabilities</span>
+                        <span class="text-lg font-bold text-rose-600" id="pharmacy-liabilities-display">0 MRU</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CUSTOMERS TAB -->
+        <section id="tab-customers" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900" data-i18n="custTitle">Customers Management</h1>
+                <button onclick="openModal('customer-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i> <span data-i18n="addCustBtn">Add Customer</span>
+                </button>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
+                            <th class="p-4" data-i18n="thCustName">Name</th>
+                            <th class="p-4" data-i18n="thCustPhone">Phone</th>
+                            <th class="p-4" data-i18n="thCustDebt">Current Debt</th>
+                            <th class="p-4" data-i18n="thCustStatus">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customers-table-body" class="divide-y divide-gray-100 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- DAILY REPORT TAB -->
+        <section id="tab-daily" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900" data-i18n="dailyTitle">Daily Summary Report</h1>
+                <button onclick="downloadPDFReport()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> <span data-i18n="downloadPdfBtn">Download PDF</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                    <span class="text-xs text-gray-500 font-medium" data-i18n="repRev">Total Revenue</span>
+                    <h4 class="text-xl font-bold text-emerald-600 mt-1" id="daily-total-rev">0 MRU</h4>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                    <span class="text-xs text-gray-500 font-medium" data-i18n="repCash">Cash Sales</span>
+                    <h4 class="text-xl font-bold text-gray-800 mt-1" id="daily-cash">0 MRU</h4>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                    <span class="text-xs text-gray-500 font-medium" data-i18n="repBank">Bank Apps</span>
+                    <h4 class="text-xl font-bold text-gray-800 mt-1" id="daily-bank">0 MRU</h4>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                    <span class="text-xs text-gray-500 font-medium" data-i18n="repDebt">Credit/Debts</span>
+                    <h4 class="text-xl font-bold text-amber-600 mt-1" id="daily-debt">0 MRU</h4>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
+                            <th class="p-4" data-i18n="thRepInv">Invoice #</th>
+                            <th class="p-4" data-i18n="thRepTime">Time</th>
+                            <th class="p-4" data-i18n="thRepMethod">Method</th>
+                            <th class="p-4" data-i18n="thRepTotal">Total</th>
+                            <th class="p-4" data-i18n="thRepStatus">Status</th>
+                            <th class="p-4 text-center" data-i18n="thRepAction">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="daily-invoices-body" class="divide-y divide-gray-100 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALS -->
+
+    <!-- Add Medicine Modal -->
+    <div id="medicine-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
+            <h3 class="text-lg font-bold text-gray-900" data-i18n="modalMedTitle">Add New Medicine</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mName">Medicine Name</label>
+                    <input type="text" id="med-name" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mType">Type</label>
+                    <select id="med-type" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <option value="tablets">tablets</option>
+                        <option value="syrup">syrup</option>
+                        <option value="capsules">capsules</option>
+                        <option value="box">box</option>
+                        <option value="vials">vials</option>
+                        <option value="other">other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mQty">Quantity</label>
+                    <input type="number" id="med-qty" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mAlert">Low Stock Alert Limit</label>
+                    <input type="number" id="med-alert" value="10" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mBuy">Buy Price (MRU)</label>
+                    <input type="number" id="med-buy" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mSell">Sell Price (MRU)</label>
+                    <input type="number" id="med-sell" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mExpiry">Expiry Date</label>
+                    <input type="date" id="med-expiry" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="mOrigin">Origin / Lab</label>
+                    <input type="text" id="med-origin" placeholder="Country / Lab" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-3">
+                <button onclick="closeModal('medicine-modal')" class="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100" data-i18n="cancelBtn">Cancel</button>
+                <button onclick="saveMedicine()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700" data-i18n="saveBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supplier Order Modal -->
+    <div id="supplier-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <h3 class="text-lg font-bold text-gray-900" data-i18n="modalSupTitle">Add Supply Order</h3>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="sAmount">Amount (MRU)</label>
+                <input type="number" id="sup-amount" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="sDesc">Description</label>
+                <input type="text" id="sup-desc" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div class="flex justify-end gap-2 pt-3">
+                <button onclick="closeModal('supplier-modal')" class="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100" data-i18n="cancelBtn">Cancel</button>
+                <button onclick="saveSupplier()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700" data-i18n="saveBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div id="customer-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <h3 class="text-lg font-bold text-gray-900" data-i18n="modalCustTitle">Add Customer</h3>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="cName">Customer Name</label>
+                <input type="text" id="cust-name" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="cPhone">Phone Number</label>
+                <input type="text" id="cust-phone" class="w-full p-2.5 bg-gray-50 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div class="flex justify-end gap-2 pt-3">
+                <button onclick="closeModal('customer-modal')" class="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100" data-i18n="cancelBtn">Cancel</button>
+                <button onclick="saveCustomer()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700" data-i18n="saveBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice View / Print Modal -->
+    <div id="invoice-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div id="printable-invoice" class="p-6 bg-white border border-gray-100 rounded-xl space-y-4">
+                <div class="flex justify-between items-center border-b pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-emerald-800">Pharmacy Pro</h2>
+                        <p class="text-xs text-gray-500" data-i18n="invDetailsSub">Invoice Details</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-bold text-gray-900" id="print-inv-num">PH/00001</span>
+                        <p class="text-xs text-gray-500" id="print-inv-date">20/08/2026 15:25</p>
+                    </div>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span data-i18n="printPayLabel">Payment: <strong id="print-inv-method">Cash</strong></span>
+                    <span data-i18n="printStatusLabel">Status: <strong id="print-inv-status" class="text-emerald-600">Paid</strong></span>
+                </div>
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b text-gray-500 text-xs">
+                            <th class="py-2" data-i18n="pItem">Item</th>
+                            <th class="py-2" data-i18n="pQty">Qty</th>
+                            <th class="py-2" data-i18n="pPrice">Price</th>
+                            <th class="py-2 text-right" data-i18n="pTotal">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="print-inv-items" class="divide-y divide-gray-50"></tbody>
+                </table>
+                <div class="flex justify-between font-bold text-base border-t pt-3">
+                    <span data-i18n="pTotalAmount">Total Amount:</span>
+                    <span id="print-inv-total" class="text-emerald-600">0 MRU</span>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('invoice-modal')" class="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100" data-i18n="closeBtn">Close</button>
+                <button onclick="downloadPDFInvoice()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 flex items-center gap-2"><i class="fa-solid fa-file-pdf"></i> <span data-i18n="downloadPdfBtn">Download PDF</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const translations = {
+            en: {
+                sysName: "Pharmacy Pro",
+                navHome: "Home",
+                navInventory: "Inventory",
+                navSuppliers: "Suppliers",
+                navSales: "Sales",
+                navDebts: "Debts",
+                navCustomers: "Customers",
+                navDaily: "Daily Report",
+                dashTitle: "Dashboard Overview",
+                statSales: "Today's Sales",
+                transactions: "Transactions",
+                statLow: "Low Stock Alert",
+                statLowSub: "Medicines ≤ 10",
+                statExpiry: "Near Expiry",
+                statExpirySub: "Check dates",
+                statDebts: "Due Debts",
+                statDebtsSub: "Customers",
+                invTitle: "Inventory Management",
+                addMedicineBtn: "Add Medicine",
+                filterAll: "All",
+                filterLow: "Low Stock",
+                filterExpiry: "Near Expiry",
+                searchPlaceholder: "Search medicine name...",
+                thName: "Name",
+                thType: "Type",
+                thQty: "Quantity",
+                thAlert: "Low Alert",
+                thBuy: "Buy Price",
+                thSell: "Sell Price",
+                thProfit: "Profit",
+                thExpiry: "Expiry Date",
+                thOrigin: "Origin / Lab",
+                thActions: "Actions",
+                supTitle: "Suppliers Management",
+                addSupplierBtn: "Add Supply Order",
+                thSupId: "ID",
+                thSupDate: "Date / Time",
+                thSupAmount: "Amount",
+                thSupDesc: "Description",
+                salesSearchPlaceholder: "Quick search medicine to sell...",
+                bestSellersTitle: "Best Sellers",
+                currentInvoiceTitle: "Current Invoice",
+                modePaid: "Paid",
+                modeDebt: "Debt",
+                selectCustomerLabel: "Select Customer",
+                paymentMethodLabel: "Payment Method",
+                methodCash: "Cash",
+                methodBank: "Bank App",
+                totalLabel: "Total:",
+                completeBtn: "Complete Transaction",
+                debtsTitle: "Debts Tracking",
+                dueDebtsTitle: "Due Debts (Time to collect)",
+                pharmacyLiabilitiesTitle: "Pharmacy Liabilities (Due to suppliers)",
+                totalLiabilitiesLabel: "Total Liabilities",
+                custTitle: "Customers Management",
+                addCustBtn: "Add Customer",
+                thCustName: "Name",
+                thCustPhone: "Phone",
+                thCustDebt: "Current Debt",
+                thCustStatus: "Status",
+                dailyTitle: "Daily Summary Report",
+                downloadPdfBtn: "Download PDF",
+                repRev: "Total Revenue",
+                repCash: "Cash Sales",
+                repBank: "Bank Apps",
+                repDebt: "Credit/Debts",
+                thRepInv: "Invoice #",
+                thRepTime: "Time",
+                thRepMethod: "Method",
+                thRepTotal: "Total",
+                thRepStatus: "Status",
+                thRepAction: "Action",
+                modalMedTitle: "Add New Medicine",
+                mName: "Medicine Name",
+                mType: "Type",
+                mQty: "Quantity",
+                mAlert: "Low Stock Alert Limit",
+                mBuy: "Buy Price (MRU)",
+                mSell: "Sell Price (MRU)",
+                mExpiry: "Expiry Date",
+                mOrigin: "Origin / Lab",
+                cancelBtn: "Cancel",
+                saveBtn: "Save",
+                modalSupTitle: "Add Supply Order",
+                sAmount: "Amount (MRU)",
+                sDesc: "Description",
+                modalCustTitle: "Add Customer",
+                cName: "Customer Name",
+                cPhone: "Phone Number",
+                invDetailsSub: "Invoice Details",
+                printPayLabel: "Payment:",
+                printStatusLabel: "Status:",
+                pItem: "Item",
+                pQty: "Qty",
+                pPrice: "Price",
+                pTotal: "Total",
+                pTotalAmount: "Total Amount:",
+                closeBtn: "Close"
+            },
+            ar: {
+                sysName: "Pharmacy Pro",
+                navHome: "الرئيسية",
+                navInventory: "المخزون",
+                navSuppliers: "الموردون",
+                navSales: "المبيعات",
+                navDebts: "الديون",
+                navCustomers: "الزبناء",
+                navDaily: "الحصيلة اليومية",
+                dashTitle: "نظرة عامة على لوحة التحكم",
+                statSales: "مبيعات اليوم",
+                transactions: "عملية بيع",
+                statLow: "تنبيه نقص المخزون",
+                statLowSub: "أدوية ≤ 10 وحدات",
+                statExpiry: "قاربة انتهاء الصلاحية",
+                statExpirySub: "تحقق من التواريخ",
+                statDebts: "الديون المستحقة",
+                statDebtsSub: "على الزبناء",
+                invTitle: "إدارة المخزون",
+                addMedicineBtn: "إضافة دواء جديد",
+                filterAll: "الكل",
+                filterLow: "نقص المخزون",
+                filterExpiry: "قريب انتهاء الصلاحية",
+                searchPlaceholder: "ابحث عن اسم الدواء...",
+                thName: "الاسم",
+                thType: "النوع",
+                thQty: "الكمية المتبقية",
+                thAlert: "حد التنبيه",
+                thBuy: "سعر الشراء",
+                thSell: "سعر البيع",
+                thProfit: "الربح",
+                thExpiry: "تاريخ الاستيراد/الصلاحية",
+                thOrigin: "دولة المنشأ/المختبر",
+                thActions: "الإجراءات",
+                supTitle: "إدارة الموردين",
+                addSupplierBtn: "إضافة عملية توريد",
+                thSupId: "الرقم",
+                thSupDate: "الوقت والتاريخ",
+                thSupAmount: "المبلغ",
+                thSupDesc: "الوصف",
+                salesSearchPlaceholder: "بحث سريع عن دواء للبيع...",
+                bestSellersTitle: "الأدوية الأكثر مبيعا",
+                currentInvoiceTitle: "الفاتورة الحالية",
+                modePaid: "مدفوعة",
+                modeDebt: "على الدين",
+                selectCustomerLabel: "اختر الزبون",
+                paymentMethodLabel: "طريقة التسديد",
+                methodCash: "نقدا",
+                methodBank: "تطبيقات بنكية",
+                totalLabel: "المجموع:",
+                completeBtn: "إنهاء وإصدار الفاتورة",
+                debtsTitle: "تتبع الديون",
+                dueDebtsTitle: "ديون حان وقت سدادها (على الزبناء)",
+                pharmacyLiabilitiesTitle: "ديون على الصيدلية (لصالح الموردين)",
+                totalLiabilitiesLabel: "إجمالي ديون الصيدلية",
+                custTitle: "إدارة الزبناء",
+                addCustBtn: "إضافة زبون",
+                thCustName: "اسم الزبون",
+                thCustPhone: "رقم الهاتف",
+                thCustDebt: "الديون الحالية",
+                thCustStatus: "الحالة",
+                dailyTitle: "تقرير الحصيلة اليومية",
+                downloadPdfBtn: "تنزيل PDF",
+                repRev: "إجمالي العائدات",
+                repCash: "مبيعات نقدية",
+                repBank: "تطبيقات بنكية",
+                repDebt: "ديون مسجلة",
+                thRepInv: "رقم الفاتورة",
+                thRepTime: "الوقت",
+                thRepMethod: "طريقة التسديد",
+                thRepTotal: "المجموع",
+                thRepStatus: "الحالة",
+                thRepAction: "عرض",
+                modalMedTitle: "إضافة دواء جديد",
+                mName: "اسم الدواء",
+                mType: "نوع الدواء",
+                mQty: "الكمية",
+                mAlert: "تنبيه عندما تصل (10 وحدات)",
+                mBuy: "سعر الشراء",
+                mSell: "سعر البيع",
+                mExpiry: "تاريخ الصلاحية/الاستيراد",
+                mOrigin: "دولة المنشأ أو المختبر",
+                cancelBtn: "إلغاء",
+                saveBtn: "حفظ",
+                modalSupTitle: "تسجيل طلبية مورد",
+                sAmount: "المبلغ (MRU)",
+                sDesc: "وصف التوريد والمختبرات",
+                modalCustTitle: "إضافة زبون جديد",
+                cName: "اسم الزبون",
+                cPhone: "رقم الهاتف والعنوان",
+                invDetailsSub: "تفاصيل الفاتورة",
+                printPayLabel: "طريقة الدفع:",
+                printStatusLabel: "الحالة:",
+                pItem: "المادة",
+                pQty: "الكمية",
+                pPrice: "السعر",
+                pTotal: "المجموع",
+                pTotalAmount: "المبلغ الإجمالي:",
+                closeBtn: "إغلاق"
+            },
+            fr: {
+                sysName: "Pharmacie Pro",
+                navHome: "Accueil",
+                navInventory: "Inventaire",
+                navSuppliers: "Fournisseurs",
+                navSales: "Ventes",
+                navDebts: "Dettes",
+                navCustomers: "Clients",
+                navDaily: "Rapport Quotidien",
+                dashTitle: "Aperçu du Tableau de Bord",
+                statSales: "Ventes du Jour",
+                transactions: "Transactions",
+                statLow: "Alerte Stock Bas",
+                statLowSub: "Médicaments ≤ 10",
+                statExpiry: "Presque Expiré",
+                statExpirySub: "Vérifier les dates",
+                statDebts: "Dettes Dues",
+                statDebtsSub: "Clients",
+                invTitle: "Gestion des Stocks",
+                addMedicineBtn: "Ajouter Médicament",
+                filterAll: "Tous",
+                filterLow: "Stock Bas",
+                filterExpiry: "Expiration Proche",
+                searchPlaceholder: "Rechercher un médicament...",
+                thName: "Nom",
+                thType: "Type",
+                thQty: "Quantité",
+                thAlert: "Alerte Seuil",
+                thBuy: "Prix Achat",
+                thSell: "Prix Vente",
+                thProfit: "Profit",
+                thExpiry: "Date d'expiration",
+                thOrigin: "Origine / Labo",
+                thActions: "Actions",
+                supTitle: "Gestion des Fournisseurs",
+                addSupplierBtn: "Ajouter Commande",
+                thSupId: "ID",
+                thSupDate: "Date / Heure",
+                thSupAmount: "Montant",
+                thSupDesc: "Description",
+                salesSearchPlaceholder: "Recherche rapide pour vente...",
+                bestSellersTitle: "Meilleures Ventes",
+                currentInvoiceTitle: "Facture Actuelle",
+                modePaid: "Payé",
+                modeDebt: "Crédit",
+                selectCustomerLabel: "Sélectionner Client",
+                paymentMethodLabel: "Mode de Paiement",
+                methodCash: "Espèces",
+                methodBank: "App Bancaire",
+                totalLabel: "Total:",
+                completeBtn: "Valider la Vente",
+                debtsTitle: "Suivi des Dettes",
+                dueDebtsTitle: "Dettes Échues (À recouvrer)",
+                pharmacyLiabilitiesTitle: "Passif de la Pharmacie (Dû aux fournisseurs)",
+                totalLiabilitiesLabel: "Total Passif",
+                custTitle: "Gestion des Clients",
+                addCustBtn: "Ajouter Client",
+                thCustName: "Nom",
+                thCustPhone: "Téléphone",
+                thCustDebt: "Dette Actuelle",
+                thCustStatus: "Statut",
+                dailyTitle: "Rapport Quotidien",
+                downloadPdfBtn: "Télécharger PDF",
+                repRev: "Revenu Total",
+                repCash: "Ventes Espèces",
+                repBank: "Apps Bancaires",
+                repDebt: "Crédits/Dettes",
+                thRepInv: "Facture #",
+                thRepTime: "Heure",
+                thRepMethod: "Méthode",
+                thRepTotal: "Total",
+                thRepStatus: "Statut",
+                thRepAction: "Action",
+                modalMedTitle: "Ajouter un Médicament",
+                mName: "Nom du Médicament",
+                mType: "Type",
+                mQty: "Quantité",
+                mAlert: "Seuil d'alerte (10 unités)",
+                mBuy: "Prix d'achat",
+                mSell: "Prix de vente",
+                mExpiry: "Date d'expiration",
+                mOrigin: "Origine / Laboratoire",
+                cancelBtn: "Annuler",
+                saveBtn: "Enregistrer",
+                modalSupTitle: "Ajouter Commande Fournisseur",
+                sAmount: "Montant (MRU)",
+                sDesc: "Description",
+                modalCustTitle: "Ajouter un Client",
+                cName: "Nom du Client",
+                cPhone: "Numéro de téléphone",
+                invDetailsSub: "Détails de la Facture",
+                printPayLabel: "Paiement:",
+                printStatusLabel: "Statut:",
+                pItem: "Article",
+                pQty: "Qté",
+                pPrice: "Prix",
+                pTotal: "Total",
+                pTotalAmount: "Montant Total:",
+                closeBtn: "Fermer"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            const root = document.getElementById('html-root');
+            if(lang === 'ar') {
+                root.setAttribute('dir', 'rtl');
+            } else {
+                root.setAttribute('dir', 'ltr');
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.innerText = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if(t[key]) el.placeholder = t[key];
+            });
+
+            renderAll();
+        }
+
+        let state = {
+            medicines: [
+                { name: 'Paracetamol', type: 'tablets', qty: 8, alert: 10, buy: 100, sell: 150, expiry: '2027-09-10', origin: 'France' }
+            ],
+            suppliers: [
+                { id: '#1', date: '19/08/2026 17:24', amount: 500000, desc: 'Sanofi Lab Stock' }
+            ],
+            customers: [
+                { name: 'Mohamed Mahmoud', phone: '22104450', debt: 0 },
+                { name: 'Aminetou Khaled', phone: '20108802', debt: 0 }
+            ],
+            invoices: [],
+            currentCart: [],
+            paymentMode: 'paid',
+            paymentMethod: 'Cash',
+            activeTab: 'home',
+            filterType: 'all'
+        };
+
+        function init() {
+            renderAll();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-emerald-700', 'bg-emerald-50');
+                el.classList.add('text-gray-600', 'hover:bg-gray-100');
+            });
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                activeBtn.classList.add('text-emerald-700', 'bg-emerald-50');
+            }
+            state.activeTab = tabId;
+            renderAll();
+        }
+
+        function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
+
+        function saveMedicine() {
+            const name = document.getElementById('med-name').value;
+            const type = document.getElementById('med-type').value;
+            const qty = parseInt(document.getElementById('med-qty').value) || 0;
+            const alert = parseInt(document.getElementById('med-alert').value) || 10;
+            const buy = parseFloat(document.getElementById('med-buy').value) || 0;
+            const sell = parseFloat(document.getElementById('med-sell').value) || 0;
+            const expiry = document.getElementById('med-expiry').value;
+            const origin = document.getElementById('med-origin').value;
+
+            if(!name) return;
+            state.medicines.push({ name, type, qty, alert, buy, sell, expiry, origin });
+            closeModal('medicine-modal');
+            renderAll();
+        }
+
+        function saveSupplier() {
+            const amount = parseFloat(document.getElementById('sup-amount').value) || 0;
+            const desc = document.getElementById('sup-desc').value;
+            const id = '#' + (state.suppliers.length + 1);
+            const now = new Date().toLocaleString();
+            state.suppliers.unshift({ id, date: now, amount, desc });
+            closeModal('supplier-modal');
+            renderAll();
+        }
+
+        function saveCustomer() {
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            if(!name) return;
+            state.customers.push({ name, phone, debt: 0 });
+            closeModal('customer-modal');
+            renderAll();
+        }
+
+        function filterInventory(type) {
+            state.filterType = type;
+            document.querySelectorAll('.inv-filter').forEach(btn => {
+                btn.classList.remove('bg-emerald-50', 'text-emerald-700', 'border', 'border-emerald-200');
+                btn.classList.add('bg-gray-50', 'text-gray-600');
+            });
+            document.getElementById(`filter-${type}`).classList.add('bg-emerald-50', 'text-emerald-700', 'border', 'border-emerald-200');
+            renderInventory();
+        }
+
+        function renderInventory() {
+            const tbody = document.getElementById('inventory-table-body');
+            const search = document.getElementById('search-medicine').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            let filtered = state.medicines.filter(m => m.name.toLowerCase().includes(search));
+            if(state.filterType === 'low') {
+                filtered = filtered.filter(m => m.qty <= m.alert);
+            } else if(state.filterType === 'expiry') {
+                filtered = filtered.filter(m => new Date(m.expiry) < new Date(Date.now() + 30*24*60*60*1000));
+            }
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-gray-400">No medicines found</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((m, idx) => {
+                const profit = m.sell - m.buy;
+                const lowClass = m.qty <= m.alert ? 'text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded' : '';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium">${m.name}</td>
+                        <td class="p-4"><span class="px-2 py-1 bg-gray-100 rounded-lg text-xs">${m.type}</span></td>
+                        <td class="p-4"><span class="${lowClass}">${m.qty}</span></td>
+                        <td class="p-4">${m.alert}</td>
+                        <td class="p-4">${m.buy} MRU</td>
+                        <td class="p-4">${m.sell} MRU</td>
+                        <td class="p-4 text-emerald-600 font-medium">${profit} MRU</td>
+                        <td class="p-4">${m.expiry}</td>
+                        <td class="p-4">${m.origin || '-'}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteMedicine(${idx})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteMedicine(index) {
+            state.medicines.splice(index, 1);
+            renderAll();
+        }
+
+        function renderSuppliers() {
+            const tbody = document.getElementById('suppliers-table-body');
+            tbody.innerHTML = '';
+            state.suppliers.forEach(s => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-semibold">${s.id}</td>
+                        <td class="p-4 text-gray-500">${s.date}</td>
+                        <td class="p-4 font-bold text-emerald-600">${s.amount} MRU</td>
+                        <td class="p-4">${s.desc}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderSalesSearch() {
+            const query = document.getElementById('sales-search-input').value.toLowerCase();
+            const container = document.getElementById('sales-search-results');
+            container.innerHTML = '';
+            if(!query) return;
+
+            const matches = state.medicines.filter(m => m.name.toLowerCase().includes(query));
+            matches.forEach(m => {
+                container.innerHTML += `
+                    <div onclick="addToCart('${m.name}')" class="p-3 bg-gray-50 hover:bg-emerald-50 border border-gray-100 rounded-xl cursor-pointer flex justify-between items-center transition">
+                        <div>
+                            <h4 class="font-semibold text-sm">${m.name}</h4>
+                            <span class="text-xs text-gray-500">Stock: ${m.qty} | Price: ${m.sell} MRU</span>
+                        </div>
+                        <i class="fa-solid fa-plus text-emerald-600"></i>
+                    </div>
+                `;
+            });
+        }
+
+        function addToCart(name) {
+            const med = state.medicines.find(m => m.name === name);
+            if(!med || med.qty <= 0) return;
+            const existing = state.currentCart.find(item => item.name === name);
+            if(existing) {
+                if(existing.qty < med.qty) existing.qty++;
+            } else {
+                state.currentCart.push({ name, price: med.sell, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('invoice-items-list');
+            list.innerHTML = '';
+            let total = 0;
+
+            state.currentCart.forEach((item, idx) => {
+                total += item.price * item.qty;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center py-2">
+                        <div>
+                            <h4 class="font-medium text-sm">${item.name}</h4>
+                            <span class="text-xs text-gray-500">${item.price} MRU × ${item.qty}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm">${item.price * item.qty} MRU</span>
+                            <button onclick="removeFromCart(${idx})" class="text-rose-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('invoice-total-display').innerText = total + ' MRU';
+            document.getElementById('invoice-number-display').innerText = 'PH/' + String(state.invoices.length + 1).padStart(5, '0');
+        }
+
+        function removeFromCart(idx) {
+            state.currentCart.splice(idx, 1);
+            renderCart();
+        }
+
+        function setPaymentMode(mode) {
+            state.paymentMode = mode;
+            const paidBtn = document.getElementById('mode-paid-btn');
+            const debtBtn = document.getElementById('mode-debt-btn');
+            const custContainer = document.getElementById('customer-select-container');
+
+            if(mode === 'paid') {
+                paidBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition";
+                debtBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-600 transition";
+                custContainer.classList.add('hidden');
+            } else {
+                debtBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-amber-600 text-white transition";
+                paidBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-600 transition";
+                custContainer.classList.remove('hidden');
+                populateCustomerSelect();
+            }
+        }
+
+        function setPaymentMethod(method) {
+            state.paymentMethod = method;
+            document.getElementById('pm-cash').className = method === 'Cash' ? "py-1.5 text-xs font-medium border rounded-lg bg-emerald-50 border-emerald-200 text-emerald-700" : "py-1.5 text-xs font-medium border rounded-lg bg-gray-50 border-gray-200 text-gray-600";
+            document.getElementById('pm-bankly').className = method === 'Bankly' ? "py-1.5 text-xs font-medium border rounded-lg bg-emerald-50 border-emerald-200 text-emerald-700" : "py-1.5 text-xs font-medium border rounded-lg bg-gray-50 border-gray-200 text-gray-600";
+        }
+
+        function populateCustomerSelect() {
+            const select = document.getElementById('invoice-customer-select');
+            select.innerHTML = '';
+            state.customers.forEach(c => {
+                select.innerHTML += `<option value="${c.name}">${c.name} (${c.phone})</option>`;
+            });
+        }
+
+        function completeSale() {
+            if(state.currentCart.length === 0) return;
+            let total = state.currentCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            state.currentCart.forEach(item => {
+                let med = state.medicines.find(m => m.name === item.name);
+                if(med) med.qty -= item.qty;
+            });
+
+            const invoice = {
+                id: 'PH/' + String(state.invoices.length + 1).padStart(5, '0'),
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                date: '20/08/2026',
+                items: [...state.currentCart],
+                total,
+                method: state.paymentMethod,
+                status: state.paymentMode === 'paid' ? 'Paid' : 'Debt',
+                customer: state.paymentMode === 'debt' ? document.getElementById('invoice-customer-select').value : 'Cash'
+            };
+
+            state.invoices.unshift(invoice);
+            state.currentCart = [];
+            renderAll();
+        }
+
+        function renderBestSellers() {
+            const container = document.getElementById('best-sellers-list');
+            container.innerHTML = '';
+            state.medicines.slice(0, 5).forEach(m => {
+                container.innerHTML += `
+                    <div onclick="addToCart('${m.name}')" class="p-3 bg-gray-50 hover:bg-emerald-50 border rounded-xl cursor-pointer text-center w-32">
+                        <h4 class="font-semibold text-sm truncate">${m.name}</h4>
+                        <span class="text-xs text-emerald-600">${m.sell} MRU</span>
+                    </div>
+                `;
+            });
+        }
+
+        function renderDebts() {
+            const list = document.getElementById('due-debts-list');
+            list.innerHTML = '';
+            const debtInvoices = state.invoices.filter(i => i.status === 'Debt');
+            if(debtInvoices.length === 0) {
+                list.innerHTML = `<p class="text-sm text-gray-400">No due debts</p>`;
+                return;
+            }
+            debtInvoices.forEach(inv => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center py-2">
+                        <div>
+                            <h4 class="font-semibold text-sm">${inv.customer}</h4>
+                            <span class="text-xs text-gray-500">Invoice: ${inv.id}</span>
+                        </div>
+                        <span class="font-bold text-amber-600">${inv.total} MRU</span>
+                    </div>
+                `;
+            });
+
+            let totalLiabilities = state.suppliers.reduce((sum, s) => sum + s.amount, 0);
+            document.getElementById('pharmacy-liabilities-display').innerText = totalLiabilities + ' MRU';
+        }
+
+        function renderCustomers() {
+            const tbody = document.getElementById('customers-table-body');
+            tbody.innerHTML = '';
+            state.customers.forEach(c => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium">${c.name}</td>
+                        <td class="p-4 text-gray-500">${c.phone}</td>
+                        <td class="p-4 font-bold text-amber-600">${c.debt} MRU</td>
+                        <td class="p-4"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs">Active</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderDailyReport() {
+            const tbody = document.getElementById('daily-invoices-body');
+            tbody.innerHTML = '';
+            let totalRev = 0, cash = 0, bank = 0, debt = 0;
+
+            state.invoices.forEach(inv => {
+                totalRev += inv.total;
+                if(inv.method === 'Cash') cash += inv.total;
+                else bank += inv.total;
+                if(inv.status === 'Debt') debt += inv.total;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-semibold">${inv.id}</td>
+                        <td class="p-4 text-gray-500">${inv.time}</td>
+                        <td class="p-4">${inv.method}</td>
+                        <td class="p-4 font-bold text-emerald-600">${inv.total} MRU</td>
+                        <td class="p-4"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs">${inv.status}</span></td>
+                        <td class="p-4 text-center">
+                            <button onclick="viewInvoice('${inv.id}')" class="text-emerald-600 hover:text-emerald-800"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('daily-total-rev').innerText = totalRev + ' MRU';
+            document.getElementById('daily-cash').innerText = cash + ' MRU';
+            document.getElementById('daily-bank').innerText = bank + ' MRU';
+            document.getElementById('daily-debt').innerText = debt + ' MRU';
+        }
+
+        function viewInvoice(id) {
+            const inv = state.invoices.find(i => i.id === id);
+            if(!inv) return;
+            document.getElementById('print-inv-num').innerText = inv.id;
+            document.getElementById('print-inv-date').innerText = `${inv.date} ${inv.time}`;
+            document.getElementById('print-inv-method').innerText = inv.method;
+            document.getElementById('print-inv-status').innerText = inv.status;
+            document.getElementById('print-inv-total').innerText = inv.total + ' MRU';
+
+            const tbody = document.getElementById('print-inv-items');
+            tbody.innerHTML = '';
+            inv.items.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-gray-50">
+                        <td class="py-2">${item.name}</td>
+                        <td class="py-2">${item.qty}</td>
+                        <td class="py-2">${item.price} MRU</td>
+                        <td class="py-2 text-right">${item.price * item.qty} MRU</td>
+                    </tr>
+                `;
+            });
+            openModal('invoice-modal');
+        }
+
+        function downloadPDFInvoice() {
+            html2pdf().from(document.getElementById('printable-invoice')).save('invoice.pdf');
+        }
+
+        function downloadPDFReport() {
+            html2pdf().from(document.getElementById('tab-daily')).save('daily-report.pdf');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-sales-today').innerText = state.invoices.length;
+            document.getElementById('stat-low-stock').innerText = state.medicines.filter(m => m.qty <= m.alert).length;
+            document.getElementById('stat-near-expiry').innerText = state.medicines.filter(m => new Date(m.expiry) < new Date(Date.now() + 30*24*60*60*1000)).length;
+            document.getElementById('stat-due-debts').innerText = state.invoices.filter(i => i.status === 'Debt').length;
+        }
+
+        function renderAll() {
+            updateStats();
+            renderInventory();
+            renderSuppliers();
+            renderBestSellers();
+            renderCart();
+            renderDebts();
+            renderCustomers();
+            renderDailyReport();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
